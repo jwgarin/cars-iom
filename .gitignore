@@ -1,0 +1,9 @@
+__pycache__
+.idea
+backups
+csv_files
+logs
+venv
+chromedriver.exe
+geckodriver.log
+chromedrivers
