@@ -65,7 +65,10 @@ def get_data(idx):
         mileage = get_specs('Milage')
     doors = get_specs('Doors')
     seat_num = get_specs('Seats')
-    price = s.find('h1').parent.find('span', class_="new-price").text.replace('£', '').replace(',', '').strip().split('.')[0]
+    try:
+        price = s.find('h1').parent.find('span', class_="new-price").text.replace('£', '').replace(',', '').strip().split('.')[0]
+    except:
+        price = ''
     try:
         price = int(price)
     except:
