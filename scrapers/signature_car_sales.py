@@ -86,7 +86,11 @@ def get_links():
         if model != '':                
             model = ' '.join(model)
         status = ''
-        color_15 = [x for x in s.find_all('span', class_="color_15")[1].strings]
+        try:
+            color_15 = [x for x in s.find_all('span', class_="color_15")[1].strings]
+        except:
+            color_15 = [x for x in s.find_all('div', class_=re.compile(r'^comp'))[-1].strings]
+        
         try:
             price = s.find('span', class_="color_15").text.replace('£', '').replace(',', '').strip()
             if 'now' in price.lower():
