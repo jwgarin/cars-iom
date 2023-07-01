@@ -19,7 +19,7 @@ data_main = []
 domain = 'http://www.philshawvehicles.im'
 start_url = 'http://www.philshawvehicles.im/your-search-results/?alllistings=true#headeranchor'
 options = Options()
-options.headless = True
+options.add_argument('--headless')
 driver = webdriver.Chrome(options=options)
 
 
@@ -51,7 +51,7 @@ def get_data(idx):
     brand = title.split(' ')[0]
     model = ' '.join(title.split('.')[0].split(' ')[1:-1])
     price = s.find('span', class_="featuresprice").text.replace('£', '').replace(',', '').replace('+VAT', '').replace('NO VAT', '').strip()
-    if not price.isdecimal() and 'Sold' in price:
+    if not price.isdecimal() and 'sold' in price.lower():
         price = ''
         status = 'Sold'
     elif price.isdecimal():
