@@ -23,7 +23,8 @@ def get_data(i):
         title = s.find('div', class_="price").text.strip()
         price = ''
     else:
-        title, price = s.find('div', class_="price").text.strip().split('£')
+        headline = s.find('div', class_="price").text.strip().split('£')
+        title, price = headline[0], ', '.join(headline[1:])
         price = price.replace('£', '').replace(',', '')
     inventory_features = s.find_all('div', class_="inventory-features-item")
     make, transmission, drive, model, year, fuel_type, mileage, style = ['']*8
@@ -102,7 +103,11 @@ def get_links():
                 'Link': link,
             })
     for i in range(len(data_main)):
-        get_data(i)
+        try:
+            get_data(i)
+        except Exception as exc:
+            print('Error on index: {}'.format(i))
+            raise Exception(exc)
 
     unique_cols = []
     for d in data_main:
