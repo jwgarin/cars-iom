@@ -7,5 +7,5 @@ venv
 chromedriver.exe
 geckodriver.log
 chromedrivers
-scrapers/*.html
+*.html
 *.csv
