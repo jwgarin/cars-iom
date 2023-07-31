@@ -39,8 +39,8 @@ def get_data(idx):
     #s = BeautifulSoup(html, 'html.parser')
     spx = Specs(s)
     get_specs = spx.get_specs
-    title = s.find('h3').text
-    price = s.find('span', class_="new-price").text.replace('£', '').replace(',', '')
+    title = s.find('h2').text
+    price = s.find('bdi', class_="new-price").text.replace('£', '').replace(',', '')
     try:
         price = int(price)
     except:
@@ -50,7 +50,7 @@ def get_data(idx):
         price = ''
     except:
         status = ''
-    images = [x.find('img')['src'] for x in s.find('div', id="cars-image-gallery").find('div').find_all('figure') if x.find('img')]
+    images = list(set([figure.find('img')['src'] for figure in s.find_all('figure') if figure.find('img')]))
     year = get_specs('year')
     model = get_specs('model')
     type_ = get_specs('body_style')
@@ -74,8 +74,8 @@ def get_data(idx):
     try:
         lis = s.find('ul', class_="tabs").find_all('li')
         for li in lis:
-            if 'Vehicle Overview' in li.text:
-                tab = li['data-tabs']
+            if 'Overview' in li.text:
+                tab = li.find('a')['aria-controls']
                 break
         else:
             raise Exception
