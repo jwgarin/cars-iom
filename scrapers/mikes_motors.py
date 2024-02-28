@@ -10,7 +10,7 @@ import re
 import bs4
 import asyncio
 
-
+#raise Exception('Fix model data')
 filename = 'mikes_motors'
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
 logger = custom_logs(filename.upper(), filename)

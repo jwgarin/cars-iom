@@ -159,7 +159,10 @@ def get_data(idx):
         'Mileage':  mileage,
         'Feature': feature
     })
-    images = [s.find('div', class_="djc_mainimage").find('img', id="djc_mainimage")['src']] + [div.find('img', class_="img-polaroid")['src'] for div in s.find('div', id="djc_thumbnails").find_all('div', class_="djc_thumbnail") if div.find('img')]
+    try:
+        images = [s.find('div', class_="djc_mainimage").find('img', id="djc_mainimage")['src']] + [div.find('img', class_="img-polaroid")['src'] for div in s.find('div', id="djc_thumbnails").find_all('div', class_="djc_thumbnail") if div.find('img')]
+    except:
+        images = []
     for i, image in enumerate(images):
         o[f'Image {i+1}'] = image
     data_main[idx] = o
@@ -189,7 +192,10 @@ def get_links():
             break
     
     for i in range(len(data_main)):
-        get_data(i)
+        try:
+            get_data(i)
+        except Exception as exc:
+            logging.info('{}/{} - {}'.format(i + 1, len(data_main), str(exc)))
         
 
     unique_cols = []
