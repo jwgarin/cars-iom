@@ -10,6 +10,8 @@ import re
 from datetime import datetime
 import bs4
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from chromedriver_binary import chromedriver_filename
 
 filename = 'philshawvehicles'
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
@@ -20,7 +22,7 @@ domain = 'http://www.philshawvehicles.im'
 start_url = 'http://www.philshawvehicles.im/your-search-results/?alllistings=true#headeranchor'
 options = Options()
 options.add_argument('--headless')
-driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome(options=options, service=Service(chromedriver_filename))
 
 
 class FourCols:

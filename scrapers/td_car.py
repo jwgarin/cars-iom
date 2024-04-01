@@ -10,7 +10,8 @@ import re
 import bs4
 from selenium.webdriver.chrome.options import Options
 import time
-
+from selenium.webdriver.chrome.service import Service
+from chromedriver_binary import chromedriver_filename
 filename = 'td_car'
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
 logger = custom_logs(filename.upper(), filename)
@@ -107,7 +108,7 @@ def get_links():
     page = 1
     options = Options()
     #options.headless = True
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options, service=Service(chromedriver_filename))
     current_url = start_url
     while True:
         #r = ses.get(url(page))

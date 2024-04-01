@@ -8,6 +8,9 @@ from urllib.parse import urljoin
 from selenium import webdriver
 import re
 import bs4
+from selenium.webdriver.chrome.service import Service
+from chromedriver_binary import chromedriver_filename
+
 
 filename = 'paulridgway_iom'
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
@@ -15,8 +18,8 @@ logger = custom_logs(filename.upper(), filename)
 ses = requests.Session()
 data_main = []
 home_url = 'http://www.paulridgwayiom.com/'
-start_url = 'http://www.paulridgwayiom.com/search-results/?lang=#headeranchor'
-#driver = webdriver.Chrome()
+start_url = 'https://www.paulridgwayiom.com/vehicle-sales/'
+driver = webdriver.Chrome(service=Service(chromedriver_filename))
 
 class Specs:
     def __init__(self, s):
@@ -24,7 +27,7 @@ class Specs:
 
     def get_specs(self, keyword):
         try:
-            return self.s.find('li', string=re.compile(keyword)).text.replace(keyword, '').strip().strip(':').strip()
+            return self.s.find('strong', string=re.compile(keyword)).next_sibling.replace(keyword, '').strip().strip(':').strip()
         except:
             return ''
 
@@ -38,23 +41,27 @@ def get_data(idx):
     try:
         title = s.find('h2', id='title').text.split('–')[1].strip()
     except:
-        title = s.find('h2', id='title').text.strip()
-    price = s.find('h2', id='pricebig').text.replace('£', '').replace(',', '').replace('+VAT', '').strip()
+        title = s.find('a', class_='u-product-title-link').text.strip()
+    #price = s.find('h2', id='pricebig').text.replace('£', '').replace(',', '').replace('+VAT', '').strip()
+    price = s.find('div', class_=re.compile(r'u-price-wrapper')).text.replace('£', '').replace(',', '').replace('+VAT', '').strip()
     if price.isdecimal():
         price = int(price)
         status = ''
     else:
         status = price
         price = ''
-    images = [e.find('img')['src'] for e in [d for d in [c for c in s.find('ul', class_='slides').contents if isinstance(c, bs4.element.Tag)] if d.name == 'li'] if e.find('img')]
+    #images = [e.find('img')['src'] for e in [d for d in [c for c in s.find('ul', class_='slides').contents if isinstance(c, bs4.element.Tag)] if d.name == 'li'] if e.find('img')]
+    images = [li.find('img')['src'] for li in s.find('ol', class_="u-carousel-thumbnails").find_all('li') if li.find('img')]
     type_ = get_specs('Body Type')
     mileage = get_specs(r'\d+ Miles')
+    if not mileage:
+        mileage = get_specs('Mileage')
     fuel_type = get_specs('Fuel Type')
     year = get_specs('Year Built')
     transmission = get_specs('Transmission')
     colour = get_specs('Exterior Colour')
     try:
-        features = s.find('p', string='Extras:').next_sibling.next_sibling
+        features = s.find('strong', string='Vehicle Details').parent.find_next_sibling('ul')
         if features.name == 'ul':
             features = str(features)
         else:
@@ -87,23 +94,31 @@ def get_data(idx):
 
 def get_links():
     url = start_url
+    driver.get(url)
+    print(url)
     while True:
-        print(url)
-        r = ses.get(url)
-        s = BeautifulSoup(r.text, 'html.parser')
-        cars_slot = s.find('div', id='content').find('div', class_="twelve columns omega").find('form').find_all('div', class_="listingblock")
+        #r = ses.get(url)
+        html = driver.find_element('xpath', '//html').get_attribute('outerHTML')
+        s = BeautifulSoup(html, 'html.parser')
+        cars_slot = s.find_all('a', href=re.compile(r'productId=\d+$'), attrs={'data-product-button-click-type': True})
         
-        for div in cars_slot:
-            link = div.find('a')['href']
+        for a in cars_slot:
+            link = a['href']
             data_main.append({
                 'Link': link,
                 'Provider': 'Paul Ridgway IOM'
             })
+        # Click next page
         try:
-            next_page = s.find('a', class_="nextpostslink")['href']
-            url = next_page
+            driver.find_element('xpath', '//a[@title="Next"]').click()
         except:
             break
+        #time.sleep(3)
+        #try:
+        #    next_page = s.find('a', class_="nextpostslink")['href']
+        #    url = next_page
+        #except:
+        #    break
 
     for i in range(len(data_main)):
         get_data(i)

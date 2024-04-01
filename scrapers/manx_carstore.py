@@ -14,9 +14,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from chromedriver_binary import chromedriver_filename
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from chromedriver_binary import chromedriver_filename
 
 
 filename = 'manx_carstore'
@@ -26,8 +26,8 @@ ses = requests.Session()
 data_main = []
 home_url = 'https://www.manxcarstore.com/'
 start_url = 'https://www.manxcarstore.com/stock/used-cars-in-isle-of-man?branch='
-#driver = uc.Chrome(driver_executable_path=chromedriver_filename, use_subprocess=True)
-driver = webdriver.Chrome(service=Service(chromedriver_filename))
+driver = uc.Chrome(driver_executable_path=chromedriver_filename, use_subprocess=True)
+#driver = webdriver.Chrome(service=Service(chromedriver_filename))
 
 class Specs:
     def __init__(self, s):

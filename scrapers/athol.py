@@ -9,6 +9,8 @@ from custom_logs import custom_logs
 import re
 import bs4
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from chromedriver_binary import chromedriver_filename
 
 
 scraper_name = filename ='athol'
@@ -48,7 +50,7 @@ def process_row(row):
 
 def main():
     global driver, data_main
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(service=Service(chromedriver_filename))
     logging.info('ATHOL Scrape Initiate')
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/111.0',

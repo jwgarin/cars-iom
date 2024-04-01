@@ -7,7 +7,8 @@ from bs4.element import NavigableString
 from urllib.parse import urljoin
 from selenium import webdriver
 import re
-
+from selenium.webdriver.chrome.service import Service
+from chromedriver_binary import chromedriver_filename
 
 filename = 'franklins'
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
@@ -15,7 +16,7 @@ logger = custom_logs(filename.upper(), filename)
 ses = requests.Session()
 data_main = []
 home_url = 'https://www.franklins.co.im'
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(service=Service(chromedriver_filename))
 
 
 def get_data(idx):

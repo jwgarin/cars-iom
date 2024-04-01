@@ -17,6 +17,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from chromedriver_binary import chromedriver_filename
 
 filename = 'oceanford'
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
@@ -28,7 +30,7 @@ start_url = 'https://www.oceanford.com/used-cars/'
 cookies = None
 options = Options()
 #options.headless = True
-driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome(options=options, service=Service(chromedriver_filename))
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0',

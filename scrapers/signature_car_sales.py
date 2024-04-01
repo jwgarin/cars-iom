@@ -12,6 +12,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 import time
+from selenium.webdriver.chrome.service import Service
+from chromedriver_binary import chromedriver_filename
 
 filename = 'signature_car_sales'
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
@@ -23,7 +25,7 @@ start_url = 'https://www.signaturecarsales.im/pre-owned'
 #options = Options()
 #options.headless = True
 #driver = webdriver.Chrome(options=options)
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(service=Service(chromedriver_filename))
 
 
 def get_data(idx):
