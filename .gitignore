@@ -9,3 +9,4 @@ geckodriver.log
 chromedrivers
 *.html
 *.csv
+*ref_files

@@ -7,7 +7,6 @@ best_cars.py
 bettridges.py
 brentmealin.py
 bvsvehicles.py
-cars_for_you.py
 dwcars.py
 franklins.py
 ingear_carsales.py

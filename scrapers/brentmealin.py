@@ -6,16 +6,20 @@ import random
 import functools
 import logging
 from custom_logs import custom_logs
+import sys
 
 
 data_main = []
 filename = 'brentmealin'
 logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %(message)s ")
 logger = custom_logs(filename.upper(), filename)
+progress = 0
+total = None
 
 
 def get_data(link):
-    r = requests.get(link)
+    global progress
+    r = requests.get(link, timeout=60)
     s = BeautifulSoup(r.text, 'html.parser')
     title = [x for x in s.find('h1').strings if x.strip() != ''][0].strip()
     description = s.find('div', class_="car-description").text.strip()
@@ -41,7 +45,8 @@ def get_data(link):
     }
     for i, image in enumerate(images):
         car_data['Image {}'.format(i+1)] = image
-    logging.info(title)
+    progress += 1
+    logging.info('{}/{}'.format(progress, total) + ' ' + title)
     data_main.append(car_data)
 
 
@@ -49,7 +54,12 @@ async def cons_process(q):
     while True:
         link = await q.get()
         await asyncio.sleep(random.uniform(0.5, 1.2))
-        await asyncio.get_event_loop().run_in_executor(None, get_data, link)
+        try:
+            await asyncio.get_event_loop().run_in_executor(None, get_data, link)
+        except Exception as e:
+            logging.error(e)
+            if not 'timeout' in str(e).lower():
+                sys.exit(1)
         q.task_done()
 
 
@@ -64,6 +74,7 @@ async def process_links(links):
 
 
 def start():
+    global total
     url = 'https://brentmealin.com/showroom/'
     links = []
     while True:
@@ -79,7 +90,7 @@ def start():
         except:
             logging.info('end of page')
             break
-
+    total = len(links)
     asyncio.run(process_links(links))
 
     unique_cols = []

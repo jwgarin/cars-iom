@@ -17,6 +17,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from chromedriver_binary import chromedriver_filename
+chromedriver_filename = 'chromedriver.exe'
 
 
 filename = 'manx_carstore'
@@ -25,8 +26,9 @@ logger = custom_logs(filename.upper(), filename)
 ses = requests.Session()
 data_main = []
 home_url = 'https://www.manxcarstore.com/'
-start_url = 'https://www.manxcarstore.com/stock/used-cars-in-isle-of-man?branch='
-driver = uc.Chrome(driver_executable_path=chromedriver_filename, use_subprocess=True)
+start_url = 'https://www.manxcarstore.com/stock/used-cars-in-isle-of-man?'
+ref_files = r'G:\Projects\iom_cars\scrapers\ref_files\manxcarstore'
+#driver = uc.Chrome(driver_executable_path=chromedriver_filename, use_subprocess=True)
 #driver = webdriver.Chrome(service=Service(chromedriver_filename))
 
 class Specs:
@@ -47,12 +49,14 @@ class Specs:
 
 def get_data(idx):
     o = data_main[idx]
-    #filename = o['Link'].replace('https://www.manxcarstore.com/vehicle/', '')
-    #with open(os.path.join(r'G:\Projects\iom_cars\ref_file\manx_carstore', filename + '.htm'), encoding='utf-8') as f:
-    #    r = f.read()
-    driver.get(o['Link'])
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//*[text()[contains(., "Home")]]')))
-    s = BeautifulSoup(driver.find_element('xpath', '//html').get_attribute('outerHTML'), 'html.parser')
+    filename = o['Link']
+    with open(os.path.join(ref_files, filename), encoding='utf-8') as f:
+        r = f.read()
+    o['Link'] = 'https://www.manxcarstore.com/vehicle/' + filename.replace('.htm', '')
+    #driver.get(o['Link'])
+    #WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//*[text()[contains(., "Home")]]')))
+    #s = BeautifulSoup(driver.find_element('xpath', '//html').get_attribute('outerHTML'), 'html.parser')
+    s = BeautifulSoup(r, 'html.parser')
     spx = Specs(s)
     get_specs = spx.get_specs
     title = ' '.join([s.find('h1', attrs={'data-v-makemodel': True}).text.strip(), s.find('h2', attrs={'data-v-version': True}).text.strip()])
@@ -167,6 +171,7 @@ def get_data(idx):
 
 
 def get_links():
+    """
     driver.get(start_url)
     page = 1
     while True:
@@ -183,7 +188,17 @@ def get_links():
             driver.find_element('xpath', '//ul[@class="pagination"]/li/a[text()[contains(., "' + str(page) + '")]]').click()
         except:
             break
-
+    """
+    unq_files = set()
+    for file in os.listdir(ref_files):
+        if not os.path.isfile(os.path.join(ref_files, file)) or file in unq_files:
+            continue        
+        else:
+            data_main.append({
+                'Link': file,
+                'Provider': 'MANX Carstore'
+            })
+        unq_files.add(file)
     for i in range(len(data_main)):
         try:
             get_data(i)

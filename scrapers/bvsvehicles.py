@@ -6,6 +6,11 @@ from custom_logs import custom_logs
 from bs4.element import NavigableString
 from urllib.parse import urljoin
 from selenium import webdriver
+from chromedriver_binary import chromedriver_filename
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 import re
 import bs4
 
@@ -15,8 +20,8 @@ logging.basicConfig(level=logging.INFO, format=" %(asctime)s - %(levelname)s - %
 logger = custom_logs(filename.upper(), filename)
 ses = requests.Session()
 data_main = []
-home_url = 'https://bvsvehicles-com.stackstaging.com/'
-start_url = 'https://bvsvehicles-com.stackstaging.com/our-vehicles/'
+home_url = 'https://bvsvehicles.com'
+start_url = 'https://bvsvehicles.com/our-vehicles/'
 #driver = webdriver.Chrome()
 
 class Specs:
@@ -96,14 +101,23 @@ def get_data(idx):
 
 
 def get_links():
-    r = ses.get(start_url)
-    s = BeautifulSoup(r.text, 'html.parser')
-    list_pages = [start_url]
-    links = s.find('nav', class_="elementor-pagination").find_all('a', class_="page-numbers")
-    for link in links:
-        if link not in list_pages:
-            list_pages.append(link['href'])
-    for link in list_pages:
+    #r = ses.get(start_url)
+    driver = webdriver.Chrome(service=Service(chromedriver_filename))
+    driver.get(start_url)
+    WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.XPATH, '//a[@class="elementor-post__thumbnail__link"]')))
+    s = BeautifulSoup(driver.find_element('xpath', '//html').get_attribute('outerHTML'), 'html.parser')
+    #list_pages = [start_url]
+    #links = s.find('nav', class_="elementor-pagination").find_all('a', class_="page-numbers")
+    links = [a['href'] for a in s.find_all('a', class_="elementor-post__thumbnail__link")]
+    #for link in links:
+    #    if link not in list_pages:
+    #        list_pages.append(link['href'])
+    for car_url in links:
+        data_main.append({
+            'Link': car_url,
+            'Provider': 'BVS Vehicles'
+        })
+    '''for link in list_pages:
         r = ses.get(link)
         s = BeautifulSoup(r.text, 'html.parser')
         try:
@@ -115,7 +129,7 @@ def get_links():
             data_main.append({
                 'Link': car_url,
                 'Provider': 'BVS Vehicles'
-            })
+            })'''
 
     for i in range(len(data_main)):
         get_data(i)

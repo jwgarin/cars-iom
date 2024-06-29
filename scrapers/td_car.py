@@ -114,6 +114,9 @@ def get_links():
         #r = ses.get(url(page))
         if current_url == start_url:
             driver.get(start_url)
+            if 'recaptcha' in driver.find_element('xpath', '//html').get_attribute('outerHTML'):
+                input('Click check to continue...')
+                time.sleep(10)
         try:
             print(driver.current_url)
         except:

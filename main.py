@@ -1,6 +1,7 @@
 import csv
 import os
 from scheduler import scheduler
+import re
 # Expected Main Data Fields
 # Title | Brand | Price | Model | Year | Engine Size |
 
@@ -69,6 +70,9 @@ def main():
         writer = csv.DictWriter(f, fieldnames=cols)
         writer.writerow(d)
         for d in rgen:
+            d['Brand'] = re.sub(r'(\d{4}\s)?\(.*?\)', '', d['Brand']).strip()
+            if not d['Year'].strip() and re.search(r'^20\d{2}', d['Brand']):
+                d['Year'] = re.search(r'^20\d{2}', d['Brand']).group()
             writer.writerow(d)
 
 
